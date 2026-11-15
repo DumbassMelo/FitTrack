@@ -171,5 +171,5 @@ El catálogo, los grupos musculares, el equipamiento, los tipos de ejercicio y l
 ---
 
 ## 👥 Autores
-- Programación de Dispositivos Móviles
-- Institución Universitaria Pascual Bravo
+- Miguel Angel Quintero Quiroz
+- Juliana Arboleda Berrio
