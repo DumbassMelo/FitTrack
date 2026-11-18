@@ -17,6 +17,12 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType>({} as AuthContextType);
 
+const isUnauthorized = (error: unknown): boolean =>
+  typeof error === 'object' &&
+  error !== null &&
+  'status' in error &&
+  error.status === 401;
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<Perfil | null>(null);
   const [token, setToken] = useState<string | null>(null);
@@ -38,8 +44,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         try {
           const profile = await authService.getProfile();
           setUser(profile);
-        } catch {
-          // Si el backend no responde, usamos el usuario en caché
+        } catch (error) {
+          if (isUnauthorized(error)) {
+            setToken(null);
+            setUser(null);
+            await authService.logout();
+          }
         }
       }
     } catch {
@@ -55,7 +65,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const profile = await authService.getProfile();
       setUser(profile);
-    } catch {
+    } catch (error) {
+      if (isUnauthorized(error)) {
+        setToken(null);
+        setUser(null);
+        await authService.logout();
+        throw new Error('La API rechazó la sesión. Inicia sesión nuevamente.');
+      }
+
       // Perfil provisional si el endpoint tarda
       const fallbackUser: Perfil = {
         idUsuario: 1,

@@ -1,9 +1,16 @@
+import Constants from 'expo-constants';
 import { Platform } from 'react-native';
 
 // URL base por defecto según la plataforma
 // Android Emulator usa 10.0.2.2 para acceder al localhost del host
-// iOS Simulator y Web usan localhost directamente
+// Expo Go usa el host del servidor Metro para llegar al PC desde un dispositivo físico
 export const getDefaultApiUrl = (): string => {
+  if (Platform.OS !== 'web') {
+    const hostUri = Constants.expoConfig?.hostUri;
+    const host = hostUri?.replace(/:\d+$/, '');
+    if (host) return `http://${host}:5123/api`;
+  }
+
   if (Platform.OS === 'android') {
     return 'http://10.0.2.2:5123/api';
   }

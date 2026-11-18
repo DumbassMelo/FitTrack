@@ -48,6 +48,7 @@ export const CreateRoutineScreen: React.FC<Props> = ({
   const [showCatalogModal, setShowCatalogModal] = useState<boolean>(false);
   const [saving, setSaving] = useState<boolean>(false);
   const [loadingCatalog, setLoadingCatalog] = useState<boolean>(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   useEffect(() => {
     loadCatalog();
@@ -71,6 +72,7 @@ export const CreateRoutineScreen: React.FC<Props> = ({
       return;
     }
 
+    setSaveError(null);
     const nextOrden = selectedExercises.length + 1;
     setSelectedExercises((prev) => [
       ...prev,
@@ -108,14 +110,16 @@ export const CreateRoutineScreen: React.FC<Props> = ({
 
   const handleSave = async () => {
     if (!nombre.trim()) {
-      Alert.alert('Validación', 'Por favor ingresa un nombre para la rutina.');
+      setSaveError('Por favor ingresa un nombre para la rutina.');
       return;
     }
 
     if (selectedExercises.length === 0) {
-      Alert.alert('Validación', 'Debes añadir al menos un ejercicio a la rutina.');
+      setSaveError('Debes añadir al menos un ejercicio a la rutina.');
       return;
     }
+
+    setSaveError(null);
 
     const payload: RutinaCreateRequest = {
       nombre: nombre.trim(),
@@ -134,8 +138,10 @@ export const CreateRoutineScreen: React.FC<Props> = ({
         await routineService.create(payload);
       }
       onSaveSuccess();
-    } catch (err: any) {
-      Alert.alert('Error', err.message || 'No se pudo guardar la rutina.');
+    } catch (err: unknown) {
+      setSaveError(
+        err instanceof Error ? err.message : 'No se pudo guardar la rutina.'
+      );
     } finally {
       setSaving(false);
     }
@@ -158,7 +164,10 @@ export const CreateRoutineScreen: React.FC<Props> = ({
           placeholder="Ej. Push, Pierna y Abdomen, Fullbody..."
           placeholderTextColor={colors.textMuted}
           value={nombre}
-          onChangeText={setNombre}
+          onChangeText={(value) => {
+            setNombre(value);
+            setSaveError(null);
+          }}
         />
 
         {/* Campo Descripción */}
@@ -247,6 +256,11 @@ export const CreateRoutineScreen: React.FC<Props> = ({
         )}
 
         {/* Botón Guardar */}
+        {saveError ? (
+          <Text style={styles.saveError} accessibilityRole="alert">
+            {saveError}
+          </Text>
+        ) : null}
         <TouchableOpacity
           style={styles.saveBtn}
           onPress={handleSave}
@@ -441,6 +455,12 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '700',
     letterSpacing: 0.8,
+  },
+  saveError: {
+    color: colors.danger,
+    fontSize: 14,
+    marginTop: 12,
+    textAlign: 'center',
   },
   modalOverlay: {
     flex: 1,

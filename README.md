@@ -138,12 +138,13 @@ El backend implementa el patrón **Command Query Separation (CQS)**:
 El catálogo carga los 302 ejercicios y sus metadatos de [Workout Guide](https://github.com/bryllim/workout-guide), y las ilustraciones se sirven desde su repositorio oficial. No se crea ninguna cuenta: regístrate desde la aplicación.
 
 ### 2. Ejecutar el Backend (.NET 10)
+EN Back/appsettings.json debes cambiar el server a tu server
 Desde la terminal en la raíz del proyecto:
 ```bash
 cd Back
 dotnet run
 ```
-La API estará escuchando en `http://localhost:5123`.
+La API estará escuchando en el puerto `5123`. Para permitir conexiones desde Expo Go, el backend escucha en la red local; usa `http://localhost:5123` desde el PC y la IP del PC desde otros dispositivos.
 
 Documentación interactiva disponible en:
 - Swagger: `http://localhost:5123/swagger`
@@ -155,12 +156,14 @@ Desde otra terminal:
 ```bash
 cd Front
 npm install
-npm start
+npx expo start --lan
 ```
 Opciones de ejecución:
 - Presionar `w` para abrir en el **Navegador Web**.
 - Presionar `a` para abrir en el **Emulador Android**.
 - Escanear el código QR con la app **Expo Go** en un dispositivo físico.
+
+Para usar Expo Go en un teléfono, conecta el teléfono y el PC a la misma red Wi-Fi y permite que .NET acepte conexiones en la red privada si Windows Firewall lo solicita. La app detecta la dirección del PC desde el servidor Expo y conecta la API por el puerto `5123`.
 
 ---
 
@@ -171,5 +174,5 @@ El catálogo, los grupos musculares, el equipamiento, los tipos de ejercicio y l
 ---
 
 ## 👥 Autores
-- Programación de Dispositivos Móviles
-- Institución Universitaria Pascual Bravo
+- Miguel Angel Quintero Quiroz
+- Juliana Arboleda Berrio
